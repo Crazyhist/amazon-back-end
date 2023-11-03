@@ -1,10 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma.service';
+import { AuthDto } from './auth.dto';
 
 @Injectable()
 export class AuthService {
-    register() {
-        return {
-            name: "Max"
-        }
+    constructor(private prisma: PrismaService) {
+        
+     async register(dto: AuthDto) {
+    //     const oldUser = await this.prisma.user.findUnique({
+    //         where: {
+    //             email: dto.email
+    //         }
+    //     })
+    // }
     }
 }
