@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma.service';
 import { AuthDto } from './auth.dto';
 import { faker } from '@faker-js/faker';
 import { hash } from 'argon2';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
