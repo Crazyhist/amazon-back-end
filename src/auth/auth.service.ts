@@ -1,7 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { AuthDto } from './auth.dto';
-import { BaseExceptionFilterContext } from '@nestjs/core/exceptions/base-exception-filter-context';
 import { faker } from '@faker-js/faker';
 import { hash } from 'argon2';
 
