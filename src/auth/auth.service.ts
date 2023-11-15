@@ -7,9 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-    constructor(private prisma: PrismaService, private jwt: JwtService) {
-
-    }
+    constructor(private prisma: PrismaService, private jwt: JwtService) {}
 
     async register(dto: AuthDto) {
        const oldUser = await this.prisma.user.findUnique({
