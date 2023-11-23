@@ -1,23 +1,41 @@
-import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { AuthDto } from './dto/auth.dto';
-import { faker, th } from '@faker-js/faker';
-import { hash } from 'argon2';
+import { faker } from '@faker-js/faker';
+import { hash, verify } from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import { error } from 'console';
+
+
 
 @Injectable()
 export class AuthService {
     constructor(private prisma: PrismaService, private jwt: JwtService) {}
 
+    async login(dto: AuthDto){
+        const user = await this.validateUser(dto)
+        const tokens = await this.issueTokens(user.id)
+
+        return {
+            user: this.returnUserFields(user),
+            ...tokens
+        }
+    }
+
     async getNewTokens(refreshToken: string){
-        const result = await this.jwt.verifyAsync(refreshToken) // расскрываем, забираем id
-        if(result) throw new UnauthorizedException('invalid refresh token')
+        const result = await this.jwt.verifyAsync(refreshToken) // расскрываем, забираем id (payload 2 часть)
+        if(!result) throw new UnauthorizedException('invalid refresh token')
 
         const user = await this.prisma.user.findUnique({where: {
             id: result.id,
         }})
+
+        const tokens = await this.issueTokens(user.id)
+
+        return {
+            user: this.returnUserFields(user),
+            ...tokens
+        }
     }
     //Получение старого юзера
     async register(dto: AuthDto) {
@@ -40,14 +58,14 @@ export class AuthService {
             }
         })
 
-        const tokens = await this.issueToken(user.id)
+        const tokens = await this.issueTokens(user.id)
 
         return {
             user: this.returnUserFields(user),
             ...tokens
         }
     }
-    private async issueToken(userId: number){
+    private async issueTokens(userId: number){
         const data = {id: userId} // payload записываем внутри токена
         
         const accessToken = this.jwt.sign(data, {
@@ -66,5 +84,22 @@ export class AuthService {
             id: user.id,
             email: user.email,
         }
+    }
+
+    //Получаем юзера
+    private async validateUser (dto: AuthDto) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                email: dto.email
+            }
+        })
+    
+        if (!user) throw new NotFoundException('User not found')
+
+        const isValid = await verify(user.password, dto.password)
+
+        if (!isValid) throw new UnauthorizedException('Invalid password')
+
+        return user
     }
 }
