@@ -51,9 +51,9 @@ export class AuthService {
         const user = await this.prisma.user.create({
             data: {
                 email: dto.email,
-                name: faker.name.firstName(),
+                name: faker.person.firstName(),
                 avatarPath: faker.image.avatar(),
-                phone: faker.phone.number('+7 (###) ###-##-##'),
+                phone: faker.phone.number(),
                 password: await hash(dto.password) // Хешурем пароль в не понятном формате 
             }
         })
@@ -96,6 +96,7 @@ export class AuthService {
     
         if (!user) throw new NotFoundException('User not found')
 
+        // пароль валидный или нет
         const isValid = await verify(user.password, dto.password)
 
         if (!isValid) throw new UnauthorizedException('Invalid password')
