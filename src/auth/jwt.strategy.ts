@@ -5,7 +5,6 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
-import { th } from '@faker-js/faker';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy)
