@@ -21,9 +21,10 @@ model User {
   name       String @unique
   avatarPath String @default("") @map("avatar_path")
 
-  phone   String   @default("")
-  orders  Order[]
-  reviews Review[]
+  phone    String    @default("")
+  orders   Order[]
+  reviews  Review[]
+  favorite Product[]
 }
 
 model Product {
@@ -42,6 +43,9 @@ model Product {
 
   categoty   Categoty @relation(fields: [categotyId], references: [id])
   categotyId Int      @map("category_id")
+
+  user   User? @relation(fields: [userId], references: [id])
+  userId Int?  @map("user_id")
 }
 
 model Categoty {
@@ -102,3 +106,5 @@ enum EnumOrderStatus {
   SHIPPED
   DELIVERED
 }
+
+//prisma db push - обновление схемы в бд 
