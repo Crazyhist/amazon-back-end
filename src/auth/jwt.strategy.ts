@@ -21,7 +21,15 @@ export class JwtStrategy extends PassportStrategy(Strategy)
     });
   }
 
-  async validate({id}: Pick<User,'id'>) {
-    return this.prisma.user.findUnique({ where: { id: +id}})
+  async validate({ id }: Pick<User, 'id'>) {
+    try {
+      const user = await this.prisma.user.findUnique({ where: { id: +id } });
+      if (!user) {
+        throw new Error('User not found');
+      }
+      return user;
+    } catch (error) {
+      throw new Error('Validation error: ' + error.message);
+    }
   }
 }
